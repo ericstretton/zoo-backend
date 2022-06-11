@@ -1,6 +1,8 @@
-from cProfile import run
+
 from helpers.db_helpers import run_query
 from flask import Flask, jsonify, request 
+from flask_cors import CORS
+import sys
 
 app = Flask(__name__)
 animals = []
@@ -26,6 +28,23 @@ def animals_post():
     
     # TODO: DB write
     
+    return jsonify("Animal added"), 201
     # run_query("INSERT INTO animal (animalName, imageURL) VALUES(?,?)", 
     #     [data.get('animalName'), data.get('animalURL')])
+    
 
+
+if len(sys.argv) > 1:
+    mode = sys.argv[1]
+else:
+    print("Missing required mode argument")
+    exit()
+if mode == 'testing':
+    CORS(app)
+    app.run(debug=True)
+elif mode == 'production':
+    import bjoern
+    bjoern.run(app, "0.0.0.0", 5007)
+else:
+    print("Mode must be in testing|production")
+    exit()
